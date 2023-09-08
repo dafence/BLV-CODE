@@ -49,7 +49,8 @@ cmd_keys = {
     b'66':   'query',
     b'67':   'exec_cmd',
     b'68':   'ping',
-    b'69':   'signal_status' # nice
+    b'69':   'signal_status', # nice
+    b'70':   'gps_status'
 }
 
 
@@ -85,6 +86,8 @@ def cmd_handler(msg):
             
             if msg == "KN6NAQ!CMD69":
                 signal_status()
+            if msg == "KN6NAQ!CMD70":
+                gps_status()
 
 
             if cmd_key in cmd_keys:
@@ -190,6 +193,21 @@ def signal_status():
     print("Sending signal status and confirmation!")
     rfm9x.send("Packet received! Relaying RSSI.")
 
+def gps_status():
+    print("Sending GPS status and confirmation!")
+    if gps.has_fix:
+        rfm9x.send(f"""
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    POSITION INFORMATION:
+    Altitude: {gps.altitude_m} meters
+    Latitude: {round(gps.latitude,6)} degrees
+    Longitude: {round(gps.longitude,6)} degrees
+    Speed: {gps.speed_knots} knots
+    Track angle: {gps.track_angle_deg} degrees
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    """)
+    else:
+        rfm9x.send("GPS does not have a fix! Please try again.")
 
   
 while True:
@@ -200,7 +218,7 @@ while True:
 
     if msg is not None:
         cmd_handler(msg)
-        # cutaway manual activation OR signal status
+        # cutaway manual activation OR signal status OR gps status
     if gps_alt == 31500:
         cut_away()
         # cutaway automatic activation

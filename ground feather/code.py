@@ -62,6 +62,9 @@ print("Waiting for packets...")
 signal_status_message = "KN6NAQ!CMD69"
 # Corresponds with BLV code that sends us back the RSSI, or signal status
 
+gps_status_message = "KN6NAQ!CMD70"
+# Corresponds with BLV code that sends us back the GPS info
+
 cut_away_message = "KN6NAQ!CMD65"
 #cut_away_message = "HELLOW0RLD23"
 
@@ -81,6 +84,7 @@ while True:
 =============================
 Options:
 [1] Get signal status
+[5] Get GPS status
 [9] Manually activate cutaway
 =============================
 Enter your choice: 
@@ -89,6 +93,9 @@ Enter your choice:
     if send_that_shit == "1":
         send_message(signal_status_message)
     
+    elif send_that_shit == "5":
+        send_message(gps_status_message)
+
     elif send_that_shit == "9":
         send_message(cut_away_message)
 
@@ -98,7 +105,7 @@ Enter your choice:
     # packet = rfm9x.receive(timeout=5.0)
     # If no packet was received during the timeout then None is returned.
 
-    if send_that_shit != "1" and send_that_shit != "9":
+    if send_that_shit != "1" and send_that_shit != "5" and send_that_shit != "9":
         print("Invalid response.")
         time.sleep(2)
         # this way, if an invalid response is entered, the "Received nothing!" line won't be printed

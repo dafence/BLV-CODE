@@ -5,7 +5,7 @@ import time
 import adafruit_rfm9x
 from adafruit_motor import servo
 import pwmio
-import adafruit_gps 
+import adafruit_gps
 
 pwm = pwmio.PWMOut(board.A0, frequency=50)
 servo = servo.Servo(pwm, min_pulse=750, max_pulse=2250)
