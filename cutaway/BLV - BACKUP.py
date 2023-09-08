@@ -169,7 +169,7 @@ def exec_cmd(args):
     print(f'exec: {args}')
     exec(args)
 
-
+#hello
   
 while True:
     rfm9x.send(gps_handler(gps_alt, gps_speed, gps_track_angle))
