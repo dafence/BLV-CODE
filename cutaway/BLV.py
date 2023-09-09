@@ -42,7 +42,10 @@ rfm9x.signal_bandwidth = 125000
 
 servo.angle=180
 
-# defines "command keys," aka the two numbers at the end of
+
+# ====================================================================================================
+
+# this defines "command keys," aka the two numbers at the end of
 # the message required to actually execute a command.
 cmd_keys = {
     b'65':   'cut_away',
@@ -54,7 +57,10 @@ cmd_keys = {
 }
 
 
-# defines a function that interprets the received message.
+# ====================================================================================================
+
+# this defines a function that interprets the received message.
+
 def cmd_handler(msg):
     try:
         header = msg[0:10]
@@ -81,9 +87,10 @@ def cmd_handler(msg):
             print(f"CMD with ARGS: {cmd_args}")
             print(f"Character count: {len(msg)}")
 
+            # this links a specific function to each specific message.
+            # these functions are defined in a later section.
             if msg == "KN6NAQ!CMD65":
                 cut_away()
-            
             if msg == "KN6NAQ!CMD69":
                 signal_status()
             if msg == "KN6NAQ!CMD70":
@@ -111,7 +118,11 @@ def cmd_handler(msg):
     except Exception as e:
         print(e)
 
-# defines a function that handles all the gps info
+
+# ====================================================================================================
+
+# this defines a function that handles all the gps info
+
 def gps_handler(gps_alt, gps_speed, gps_track_angle):
     # Make sure to call gps.update() every loop iteration and at least twice
     # as fast as data comes from the GPS unit (usually every second).
@@ -171,6 +182,10 @@ def gps_handler(gps_alt, gps_speed, gps_track_angle):
     return gps_data_string
 
 
+# ====================================================================================================
+
+# this section defines functions that correspond to the "command keys"
+
 def cut_away():
     print("Cutting!")
     servo.angle = 0
@@ -209,7 +224,11 @@ def gps_status():
     else:
         rfm9x.send("GPS does not have a fix! Please try again.")
 
-  
+
+# ====================================================================================================
+
+# this is the actual looping code (must define all functions beforehand)
+
 while True:
     rfm9x.send(gps_handler(gps_alt, gps_speed, gps_track_angle))
     msg = rfm9x.receive()
