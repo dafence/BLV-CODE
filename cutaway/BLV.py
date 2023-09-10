@@ -53,7 +53,8 @@ cmd_keys = {
     b'67':   'exec_cmd',
     b'68':   'ping',
     b'69':   'signal_status', # nice
-    b'70':   'gps_status'
+    b'70':   'alt_status',
+    b'71':   'coord_status'
 }
 
 
@@ -94,7 +95,9 @@ def cmd_handler(msg):
             if msg == "KN6NAQ!CMD69":
                 signal_status()
             if msg == "KN6NAQ!CMD70":
-                gps_status()
+                alt_status()
+            if msg == "KN6NAQ!CMD71":
+                coord_status()
 
 
             if cmd_key in cmd_keys:
@@ -131,6 +134,8 @@ def gps_handler(gps_alt, gps_speed, gps_track_angle):
     gps.update()
     # Every second print out current location details if there's a fix.
 
+    print("=" * 40)  # Print a separator line.
+
     if not gps.has_fix:
         # Try again if we don't have a fix yet.
         print("Waiting for fix...")
@@ -138,7 +143,7 @@ def gps_handler(gps_alt, gps_speed, gps_track_angle):
         return "No GPS Fix"
     # We have a fix! (gps.has_fix is true)
     # Print out details about the fix like location, date, etc.
-    print("=" * 40)  # Print a separator line.
+
     print(
         "Fix timestamp UTC: {}/{}/{} {:02}:{:02}:{:02}".format(
             gps.timestamp_utc.tm_mon,  # Grab parts of the time from the
@@ -208,19 +213,20 @@ def signal_status():
     print("Sending signal status and confirmation!")
     rfm9x.send("Packet received! Relaying RSSI.")
 
-def gps_status():
-    print("Sending GPS status and confirmation!")
+def alt_status():
+    print("Sending current altitude!")
     if gps.has_fix:
-        rfm9x.send(f"""
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    POSITION INFORMATION:
-    Altitude: {gps.altitude_m} meters
-    Latitude: {round(gps.latitude,6)} degrees
-    Longitude: {round(gps.longitude,6)} degrees
-    Speed: {gps.speed_knots} knots
-    Track angle: {gps.track_angle_deg} degrees
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    """)
+        if gps.altitude_m is not None:
+            rfm9x.send(f"Altitude: {gps.altitude_m} meters")
+        else:
+            rfm9x.send("GPS has a fix, but altitude not available! Please try again.")
+    else:
+        rfm9x.send("GPS does not have a fix! Please try again.")
+
+def coord_status():
+    print("Sending coordinates!")
+    if gps.has_fix:
+        rfm9x.send("""Latitude: {} degrees, Longitude: {} degrees""".format(round(gps.latitude, 6), round(gps.longitude,6)))
     else:
         rfm9x.send("GPS does not have a fix! Please try again.")
 
